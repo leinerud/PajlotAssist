@@ -3,7 +3,7 @@ import SwiftUI
 struct PopoverView: View {
     @EnvironmentObject var store: SessionStore
     @State private var filter: Filter = .active
-    enum Filter: String, CaseIterable { case active = "Active", recent = "Recent" }
+    enum Filter: String, CaseIterable { case active = "Now", recent = "All" }
 
     private var shown: [CopilotSession] {
         switch filter {
@@ -28,45 +28,56 @@ struct PopoverView: View {
             footer
         }
         .frame(width: 400)
+        .fixedSize(horizontal: false, vertical: true)
+        .background(Color(nsColor: .windowBackgroundColor))
         .onAppear { store.doneAt = nil }
     }
 
     private var header: some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 1) {
-                Text("Copilot sessions").font(.headline)
+                Text("Your Copilot work").font(.headline)
+                    .help("Each item is one conversation (a “session”) you've had with GitHub Copilot.")
                 Text(summaryLine).font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
             Picker("", selection: $filter) {
                 ForEach(Filter.allCases, id: \.self) { Text($0.rawValue).tag($0) }
             }
-            .pickerStyle(.segmented).labelsHidden().frame(width: 130)
+            .pickerStyle(.segmented).labelsHidden().frame(width: 110)
+            .help("Now: work in progress or waiting for you. All: everything, including finished work.")
         }
         .padding(.horizontal, 14).padding(.vertical, 10)
     }
 
     private var summaryLine: String {
         let n = store.needsInputCount, a = store.activeCount
-        if n > 0 { return "\(n) waiting for you · \(a) active" }
-        if a > 0 { return "\(a) working right now" }
-        return "Nothing running"
+        if n > 0 { return n == 1 ? "1 needs your answer" : "\(n) need your answer" }
+        if a > 0 { return a == 1 ? "Copilot is working on 1 thing" : "Copilot is working on \(a) things" }
+        let idle = store.sessions.filter { $0.status == .idle }.count
+        if idle > 0 { return "All quiet · Copilot is ready for your next request" }
+        return "Nothing running right now"
     }
 
     private var empty: some View {
         VStack(spacing: 6) {
             Image(systemName: "moon.zzz").font(.title).foregroundStyle(.secondary)
-            Text("No active sessions").font(.subheadline)
-            Text("Switch to Recent to see earlier work.").font(.caption).foregroundStyle(.secondary)
-        }.frame(maxWidth: .infinity).padding(.vertical, 40)
+            Text(filter == .active ? "Nothing in progress" : "No Copilot work found yet").font(.subheadline)
+            Text(filter == .active
+                 ? "When you ask Copilot to do something, it shows up here. Tap “All” to see earlier work."
+                 : "Open GitHub Copilot and start a chat. It will appear here automatically.")
+                .font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
+        }.frame(maxWidth: .infinity).padding(.vertical, 40).padding(.horizontal, 24)
     }
 
     private var footer: some View {
         HStack {
             Button { SessionActions.openCopilot() } label: { Label("Open GitHub Copilot", systemImage: "arrow.up.forward.app") }
+                .help("Opens the Copilot app so you can chat with it")
             Spacer()
-            Button("Refresh") { store.refresh() }
+            Button("Refresh") { store.refresh() }.help("Check for the latest updates")
             Button("Quit") { NSApplication.shared.terminate(nil) }.keyboardShortcut("q")
+                .help("Close this helper (Copilot itself keeps running)")
         }
         .buttonStyle(.plain).font(.caption).foregroundStyle(.secondary)
         .padding(.horizontal, 14).padding(.vertical, 8)
@@ -98,12 +109,16 @@ struct SessionCard: View {
 
             HStack(spacing: 6) {
                 Image(systemName: "folder").font(.caption2)
-                Text(session.repoShortName)
+                Text(session.repoShortName).help("The project Copilot is working in")
                 if let b = session.branch {
                     Image(systemName: "arrow.triangle.branch").font(.caption2)
                     Text(b).lineLimit(1)
+                        .help("Your own copy of the project to experiment in (called a “branch”). Your changes don't affect the main version until they're reviewed.")
                 }
             }.font(.caption).foregroundStyle(.secondary)
+
+            Text("\(session.status.label) — \(nextStep)")
+                .font(.caption2).foregroundStyle(session.status == .needsInput ? .orange : .secondary)
 
             if let q = session.question {
                 Label { Text(q).lineLimit(3) } icon: { Image(systemName: "bubble.left.fill") }
@@ -136,6 +151,15 @@ struct SessionCard: View {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(session.status == .needsInput ? Color.orange.opacity(0.6) : .clear, lineWidth: 1))
     }
 
+    private var nextStep: String {
+        switch session.status {
+        case .needsInput: "Copilot asked you something. Open Copilot to answer."
+        case .working: "You can keep working while it finishes."
+        case .idle: "Done for now. Open Copilot to give it the next task."
+        case .stopped: "This conversation has ended. Start a new one in Copilot."
+        }
+    }
+
     @ViewBuilder private var progress: some View {
         if let p = session.progress {
             VStack(alignment: .leading, spacing: 4) {
@@ -145,9 +169,9 @@ struct SessionCard: View {
                         .lineLimit(1)
                     Spacer()
                     Button { withAnimation(.snappy) { expanded.toggle() } } label: {
-                        Text("\(session.doneCount)/\(session.todos.count)")
+                        Text(expanded ? "Hide steps" : "Show steps (\(session.doneCount)/\(session.todos.count))")
                         Image(systemName: expanded ? "chevron.up" : "chevron.down")
-                    }.buttonStyle(.plain)
+                    }.buttonStyle(.plain).help("Copilot's to-do list for this task")
                 }.font(.caption).foregroundStyle(.secondary)
             }
         } else if session.status == .working {
@@ -157,18 +181,26 @@ struct SessionCard: View {
 
     private var actions: some View {
         HStack(spacing: 6) {
-            ActionButton("Open Copilot", "arrow.up.forward.app", prominent: session.status == .needsInput) { SessionActions.openCopilot() }
-            ActionButton("Folder", "folder") { SessionActions.showInFinder(session) }
-            ActionButton("Editor", "chevron.left.forwardslash.chevron.right") { SessionActions.openInEditor(session) }
-            if session.repository != nil {
-                ActionButton("Branch", "arrow.triangle.branch") { SessionActions.openBranch(session) }
-                ActionButton("PRs", "arrow.triangle.pull") { SessionActions.openPullRequests(session) }
+            Button { SessionActions.openCopilot() } label: {
+                Label(session.status == .needsInput ? "Answer in Copilot" : "Open Copilot", systemImage: "arrow.up.forward.app")
             }
+            .buttonStyle(.borderedProminent).controlSize(.small)
+            .tint(session.status == .needsInput ? .orange : .accentColor)
+            .help("Open the Copilot app")
             Spacer(minLength: 0)
             Menu {
-                Button("Copy session ID") { SessionActions.copyID(session) }
-            } label: { Image(systemName: "ellipsis") }
+                Button { SessionActions.showInFinder(session) } label: { Label("Show project files in Finder", systemImage: "folder") }
+                Button { SessionActions.openInEditor(session) } label: { Label("Open in code editor", systemImage: "chevron.left.forwardslash.chevron.right") }
+                if session.repository != nil {
+                    Divider()
+                    Button { SessionActions.openBranch(session) } label: { Label("See my version on GitHub", systemImage: "arrow.triangle.branch") }
+                    Button { SessionActions.openPullRequests(session) } label: { Label("See review requests on GitHub", systemImage: "arrow.triangle.pull") }
+                }
+                Divider()
+                Button { SessionActions.copyID(session) } label: { Label("Copy session ID (for support)", systemImage: "doc.on.doc") }
+            } label: { Label("More", systemImage: "ellipsis.circle") }
                 .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+                .help("Other places you can jump to from this session")
         }
     }
 
