@@ -13,7 +13,7 @@ struct PajlotSessionsWidget: Widget {
         }
         .configurationDisplayName("Copilot sessions")
         .description("See which sessions are working, done, or waiting for you.")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge])
     }
 }
 
@@ -90,7 +90,7 @@ struct WidgetView: View {
 
     var body: some View {
         Group {
-            if family == .systemSmall { small } else { list(max: family == .systemLarge ? 6 : 3) }
+            if family == .systemSmall { small } else { list(max: family == .systemExtraLarge ? 10 : family == .systemLarge ? 6 : 3) }
         }
         .containerBackground(Tint.canvas(scheme), for: .widget)
     }
@@ -120,7 +120,7 @@ struct WidgetView: View {
             if sessions.isEmpty {
                 Spacer(minLength: 0); empty.frame(maxWidth: .infinity); Spacer(minLength: 0)
             } else {
-                ForEach(sessions.prefix(max)) { Row(session: $0, showQuestion: family == .systemLarge) }
+                ForEach(sessions.prefix(max)) { Row(session: $0, showQuestion: family == .systemLarge || family == .systemExtraLarge) }
                 Spacer(minLength: 0)
             }
         }

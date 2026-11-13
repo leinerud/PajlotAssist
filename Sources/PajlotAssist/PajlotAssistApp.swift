@@ -12,9 +12,10 @@ struct PajlotAssistApp: App {
         // The Dock window: the same view as the menu bar popover, in a regular window.
         // It opens at launch only for Dock users who are past the welcome screen.
         Window("Pajlot Assist", id: MainWindow.id) {
-            PopoverView().environmentObject(store).registersWindowOpener()
+            PopoverView(resizable: true).environmentObject(store).registersWindowOpener()
         }
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: Metrics.width, height: 520)
         .defaultPosition(.topTrailing)
         .defaultLaunchBehavior(Prefs.hasSeenWelcome && Prefs.showInDock ? .presented : .suppressed)
 

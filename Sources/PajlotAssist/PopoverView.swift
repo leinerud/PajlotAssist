@@ -59,12 +59,27 @@ extension SessionStatus {
 
 // MARK: - Popover
 
+private struct SizingModifier: ViewModifier {
+    let resizable: Bool
+    func body(content: Content) -> some View {
+        if resizable {
+            content.frame(minWidth: 320, idealWidth: Metrics.width, maxWidth: .infinity,
+                          minHeight: 320, idealHeight: 520, maxHeight: .infinity)
+        } else {
+            content.frame(width: Metrics.width).fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
 struct PopoverView: View {
     @EnvironmentObject var store: SessionStore
     @State private var filter: Filter = .active
     @State private var listHeight: CGFloat = 0
     @State private var spin = 0.0
     @Environment(\.openSettings) private var openSettings
+    /// In the Dock window the view stretches to whatever size the user drags the window to;
+    /// in the menu bar popover it keeps its compact, content-sized shape.
+    var resizable = false
 
     enum Filter: String, CaseIterable, Identifiable {
         case active = "Now", recent = "All"
@@ -94,8 +109,7 @@ struct PopoverView: View {
             if shown.isEmpty { emptyState } else { list }
             footer
         }
-        .frame(width: Metrics.width)
-        .fixedSize(horizontal: false, vertical: true)
+        .modifier(SizingModifier(resizable: resizable))
         .background(backdrop)
         .animation(.snappy(duration: 0.28), value: filter)
         .onAppear { store.doneAt = nil }
@@ -166,7 +180,8 @@ struct PopoverView: View {
             }
         }
         .scrollIndicators(.automatic)
-        .frame(height: min(max(listHeight, 120), Metrics.maxListHeight))
+        .frame(height: resizable ? nil : min(max(listHeight, 120), Metrics.maxListHeight))
+        .frame(maxHeight: resizable ? .infinity : nil)
         .mask {
             VStack(spacing: 0) {
                 LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom).frame(height: 6)
@@ -202,7 +217,7 @@ struct PopoverView: View {
                     .padding(.top, 6)
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: resizable ? .infinity : nil)
         .padding(.top, 26)
         .padding(.bottom, 34)
     }
