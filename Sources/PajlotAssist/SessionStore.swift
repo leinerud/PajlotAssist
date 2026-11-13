@@ -22,6 +22,9 @@ final class SessionStore: ObservableObject {
         }
     }
 
+    /// Static store for previews and snapshots; never touches Copilot's data.
+    init(preview: [CopilotSession]) { sessions = preview }
+
     func refresh() {
         let home = home
         let cached = cache
