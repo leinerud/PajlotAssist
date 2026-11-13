@@ -18,57 +18,25 @@ struct PajlotAssistApp: App {
 
 struct MenuBarLabel: View {
     @EnvironmentObject var store: SessionStore
+    @StateObject private var animator = MenuBarIconAnimator()
     private let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
 
-    private var workingCount: Int { store.sessions.filter { $0.status == .working }.count }
+    private var mode: MenuBarIconMode {
+        if store.needsInputCount > 0 { return .needsInput }
+        if store.sessions.contains(where: { $0.status == .working }) { return .working }
+        if store.doneAt != nil { return .done }
+        return .idle
+    }
 
     var body: some View {
         HStack(spacing: 3) {
-            Image(nsImage: icon)
+            Image(nsImage: animator.image)
             if store.activeCount > 0 { Text("\(store.activeCount)") }
         }
+        .onAppear { animator.set(mode) }
+        .onChange(of: mode) { _, new in animator.set(new) }
         .onReceive(timer) { _ in
             if let d = store.doneAt, Date().timeIntervalSince(d) > 120 { store.doneAt = nil }
         }
-    }
-
-    private var icon: NSImage {
-        if store.needsInputCount > 0 {
-            // Blink the speech bubble so it catches the eye.
-            let name = "bubble.left.fill"
-            let img = NSImage(systemSymbolName: name, accessibilityDescription: "A session needs you") ?? NSImage()
-            img.isTemplate = true
-            return img
-        }
-        if workingCount > 0 { return Self.spinner(frame: 0) }
-        if store.doneAt != nil {
-            let img = NSImage(systemSymbolName: "checkmark.circle.fill", accessibilityDescription: "A session finished") ?? NSImage()
-            img.isTemplate = true
-            return img
-        }
-        let name = store.activeCount > 0 ? "circle.dotted" : "moon.zzz"
-        let img = NSImage(systemSymbolName: name, accessibilityDescription: "Sessions") ?? NSImage()
-        img.isTemplate = true
-        return img
-    }
-
-    /// A dot in the middle of a ring with a rotating arc, so activity is visible at a glance.
-    static func spinner(frame: Int) -> NSImage {
-        let size = NSSize(width: 18, height: 18)
-        let img = NSImage(size: size, flipped: false) { rect in
-            NSColor.black.setStroke(); NSColor.black.setFill()
-            let c = NSPoint(x: rect.midX, y: rect.midY)
-            let ring = NSBezierPath()
-            ring.appendArc(withCenter: c, radius: 7.5, startAngle: 0, endAngle: 360)
-            ring.lineWidth = 1; NSColor.black.withAlphaComponent(0.3).setStroke(); ring.stroke()
-            let start = CGFloat(-frame * 30)
-            let arc = NSBezierPath()
-            arc.appendArc(withCenter: c, radius: 7.5, startAngle: start, endAngle: start - 100, clockwise: true)
-            arc.lineWidth = 2; arc.lineCapStyle = .round; NSColor.black.setStroke(); arc.stroke()
-            NSBezierPath(ovalIn: NSRect(x: c.x - 2.2, y: c.y - 2.2, width: 4.4, height: 4.4)).fill()
-            return true
-        }
-        img.isTemplate = true
-        return img
     }
 }
