@@ -19,6 +19,28 @@ struct PajlotSessionsWidget: Widget {
 
 // MARK: - Timeline
 
+extension Font {
+    /// Inter, bundled with the widget (registered once, since an extension can't rely on installed fonts).
+    static func inter(_ size: CGFloat, _ weight: Font.Weight) -> Font {
+        _ = registerInter
+        let name: String
+        switch weight {
+        case .bold, .heavy, .black: name = "Inter-Bold"
+        case .semibold: name = "Inter-SemiBold"
+        case .medium: name = "Inter-Medium"
+        default: name = "Inter-Regular"
+        }
+        return .custom(name, fixedSize: size)
+    }
+    private static let registerInter: Void = {
+        for w in ["Regular", "Medium", "SemiBold", "Bold"] {
+            if let url = Bundle.main.url(forResource: "Inter-\(w)", withExtension: "ttf") {
+                CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+            }
+        }
+    }()
+}
+
 struct Entry: TimelineEntry {
     let date: Date
     let snapshot: WidgetSnapshot
@@ -53,16 +75,17 @@ extension WidgetSnapshot {
 // MARK: - Look (matches the popover's palette)
 
 private enum Tint {
-    static func accent(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 150/255, green: 136/255, blue: 1) : Color(red: 99/255, green: 82/255, blue: 238/255) }
-    static func attention(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 1, green: 159/255, blue: 67/255) : Color(red: 232/255, green: 110/255, blue: 18/255) }
-    static func ready(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 64/255, green: 208/255, blue: 140/255) : Color(red: 22/255, green: 156/255, blue: 98/255) }
-    static func canvas(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 24/255, green: 24/255, blue: 27/255) : Color(red: 244/255, green: 244/255, blue: 247/255) }
-    static func card(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 36/255, green: 36/255, blue: 40/255) : .white }
+    // One warm accent, used only for what needs you. Everything else is monochrome.
+    static func attention(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 1, green: 0.62, blue: 0.40) : Color(red: 0.89, green: 0.43, blue: 0.20) }
+    static func working(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 112/255, green: 162/255, blue: 1) : Color(red: 62/255, green: 115/255, blue: 224/255) }
+    static func ready(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 88/255, green: 204/255, blue: 170/255) : Color(red: 44/255, green: 150/255, blue: 124/255) }
+    static func canvas(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 0.075, green: 0.075, blue: 0.085) : Color(red: 0.975, green: 0.975, blue: 0.98) }
+    static func card(_ s: ColorScheme) -> Color { s == .dark ? Color(red: 0.125, green: 0.125, blue: 0.14) : .white }
 
     static func status(_ raw: String, _ s: ColorScheme) -> Color {
         switch raw {
         case "needsInput": attention(s)
-        case "working": accent(s)
+        case "working": working(s)
         case "idle": ready(s)
         default: .secondary
         }
@@ -90,7 +113,7 @@ struct WidgetView: View {
 
     var body: some View {
         Group {
-            if family == .systemSmall { small } else { list(max: family == .systemExtraLarge ? 10 : family == .systemLarge ? 6 : 3) }
+            if family == .systemSmall { small } else { list(max: family == .systemExtraLarge ? 8 : family == .systemLarge ? 5 : 2) }
         }
         .containerBackground(Tint.canvas(scheme), for: .widget)
     }
@@ -102,11 +125,11 @@ struct WidgetView: View {
             Spacer(minLength: 0)
             if let top = sessions.first {
                 Text(needs > 0 ? "\(needs)" : "\(working)")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(Tint.status(needs > 0 ? "needsInput" : working > 0 ? "working" : "idle", scheme))
+                    .font(.inter(46, .bold))
+                    .foregroundStyle(needs > 0 ? Tint.attention(scheme) : .primary)
                 Text(needs > 0 ? "need you" : working > 0 ? "working" : "all done")
-                    .font(.caption.weight(.medium)).foregroundStyle(.secondary)
-                Text(top.title).font(.caption2).lineLimit(2).padding(.top, 2)
+                    .font(.inter(14, .medium)).foregroundStyle(.secondary)
+                Text(top.title).font(.inter(14, .semibold)).lineLimit(2).padding(.top, 2)
             } else {
                 empty
             }
@@ -115,7 +138,7 @@ struct WidgetView: View {
     }
 
     private func list(max: Int) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             header
             if sessions.isEmpty {
                 Spacer(minLength: 0); empty.frame(maxWidth: .infinity); Spacer(minLength: 0)
@@ -129,20 +152,20 @@ struct WidgetView: View {
 
     private var header: some View {
         HStack(spacing: 5) {
-            Image(systemName: "sparkles").font(.caption.weight(.semibold)).foregroundStyle(Tint.accent(scheme))
-            Text("Pajlot").font(.caption.weight(.semibold))
+            LogoMark().frame(width: 18, height: 18).foregroundStyle(scheme == .dark ? Color(white: 0.95) : Color(red: 0x23/255, green: 0x23/255, blue: 0x23/255)).widgetAccentable()
+            Text("Pajlot").font(.inter(15, .semibold))
             Spacer(minLength: 0)
             if family != .systemSmall {
                 if needs > 0 { Badge(text: "\(needs) need you", tint: Tint.attention(scheme)) }
-                if working > 0 { Badge(text: "\(working) working", tint: Tint.accent(scheme)) }
+                if working > 0 { Badge(text: "\(working) working", tint: .secondary) }
             }
         }
     }
 
     private var empty: some View {
         VStack(spacing: 3) {
-            Image(systemName: "moon.zzz").font(.title3).foregroundStyle(.secondary)
-            Text("No active sessions").font(.caption).foregroundStyle(.secondary)
+            Image(systemName: "moon.zzz").font(.inter(22, .regular)).foregroundStyle(.secondary)
+            Text("No active sessions").font(.inter(14, .regular)).foregroundStyle(.secondary)
         }
     }
 }
@@ -151,8 +174,8 @@ private struct Badge: View {
     let text: String
     let tint: Color
     var body: some View {
-        Text(text).font(.caption2.weight(.semibold)).foregroundStyle(tint)
-            .padding(.horizontal, 6).padding(.vertical, 2)
+        Text(text).font(.inter(12, .semibold)).foregroundStyle(tint)
+            .padding(.horizontal, 9).padding(.vertical, 3)
             .background(Capsule().fill(tint.opacity(0.14)))
     }
 }
@@ -162,34 +185,68 @@ private struct Row: View {
     let showQuestion: Bool
     @Environment(\.colorScheme) private var scheme
 
+    static func ago(_ d: Date) -> String {
+        let f = RelativeDateTimeFormatter(); f.unitsStyle = .abbreviated
+        return f.localizedString(for: d, relativeTo: .now)
+    }
+    @Environment(\.widgetRenderingMode) private var mode
+
     var body: some View {
         let tint = Tint.status(session.status, scheme)
         HStack(alignment: .top, spacing: 8) {
             Capsule().fill(tint).frame(width: 3)
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
-                    Text(session.title).font(.caption.weight(.semibold)).lineLimit(1)
+                    Text(session.title).font(.inter(14, .semibold)).lineLimit(1)
                     Spacer(minLength: 4)
-                    Text(session.updatedAt, style: .relative).font(.caption2).foregroundStyle(.tertiary).lineLimit(1)
-                        .frame(maxWidth: 70, alignment: .trailing)
+                    Text(Self.ago(session.updatedAt)).font(.inter(12, .regular)).foregroundStyle(.secondary).lineLimit(1)
                 }
                 HStack(spacing: 4) {
                     Text(session.status == "working" ? session.activity : Tint.label(session.status))
-                        .foregroundStyle(tint)
+                        .foregroundStyle(session.status == "needsInput" ? tint : .secondary)   // only the line carries the status colour
                     Text("· \(session.repo)").foregroundStyle(.secondary)
                     Spacer(minLength: 4)
                     if session.total > 0 {
                         Text("\(session.done)/\(session.total)").foregroundStyle(.secondary).monospacedDigit()
                     }
                 }
-                .font(.caption2).lineLimit(1)
+                .font(.inter(12, .regular)).lineLimit(1)
                 if showQuestion, let q = session.question {
-                    Text(q).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
+                    Text(q).font(.inter(12, .regular)).foregroundStyle(.secondary).lineLimit(2)
                 }
             }
         }
-        .padding(.vertical, 5).padding(.horizontal, 7)
-        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Tint.card(scheme)))
+        .padding(.vertical, 7).padding(.horizontal, 9)
+        .background(RoundedRectangle(cornerRadius: 9, style: .continuous)
+            // In glass/tinted mode text is drawn white, so a solid white card would hide it.
+            .fill(mode == .fullColor ? Tint.card(scheme) : Color.white.opacity(0.14)))
+        .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(Color.primary.opacity(0.06), lineWidth: 0.5))
         .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+
+/// The app logo (open ring, centre dot, small dot in the gap), same shapes as the menu bar icon.
+private struct LogoMark: View {
+    var body: some View {
+        Canvas { ctx, size in
+            let k = size.width / 18
+            let c = CGPoint(x: size.width / 2, y: size.height / 2)
+            let ringR = 6.4 * k, gapCenter = 135.0, gap = 90.0
+            func pt(_ deg: Double, _ r: Double) -> CGPoint {
+                let a = deg * .pi / 180
+                return CGPoint(x: c.x + cos(a) * r, y: c.y - sin(a) * r)   // y is down on screen
+            }
+            var ring = Path()
+            let start = gapCenter + gap / 2, sweep = 360 - gap
+            ring.move(to: pt(start, ringR))
+            for i in 1...90 { ring.addLine(to: pt(start + sweep * Double(i) / 90, ringR)) }
+            ctx.stroke(ring, with: .foreground, style: StrokeStyle(lineWidth: 2.1 * k, lineCap: .round, lineJoin: .round))
+            func dot(_ p: CGPoint, _ r: Double) {
+                ctx.fill(Path(ellipseIn: CGRect(x: p.x - r, y: p.y - r, width: r * 2, height: r * 2)), with: .foreground)
+            }
+            dot(pt(gapCenter, ringR), 1.25 * k)
+            dot(c, 2.2 * k)
+        }
     }
 }

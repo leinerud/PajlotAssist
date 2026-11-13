@@ -53,7 +53,7 @@ struct WelcomeView: View {
     private func block<C: View>(number: Int, title: String, @ViewBuilder content: () -> C) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Text("\(number)").font(.system(size: 11, weight: .bold)).foregroundStyle(.white)
+                Text("\(number)").font(.system(size: 11, weight: .bold)).foregroundStyle(Palette.canvas)
                     .frame(width: 20, height: 20).background(Circle().fill(Palette.accent))
                 Text(title).font(.system(size: 14, weight: .semibold))
             }

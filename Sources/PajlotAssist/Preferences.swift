@@ -183,7 +183,7 @@ private struct MockWidget: View {
                 Text("need you").font(.system(size: 7.5, weight: .medium)).foregroundStyle(.secondary)
             } else {
                 row("Redesign onboarding", "Needs you", Palette.attention)
-                row("Fix dark mode colours", "Working", Palette.accent)
+                row("Fix dark mode colours", "Working", Palette.working)
                 row("Update README", "Done", Palette.ready)
             }
         }
