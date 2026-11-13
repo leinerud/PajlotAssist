@@ -1,64 +1,517 @@
 // !$*UTF8*$!
-{archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
-A100 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>";};
-B100 = {isa = PBXBuildFile; fileRef = A100;};
-A101 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTail.swift; sourceTree = "<group>";};
-B101 = {isa = PBXBuildFile; fileRef = A101;};
-A102 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>";};
-B102 = {isa = PBXBuildFile; fileRef = A102;};
-A103 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PajlotAssistApp.swift; sourceTree = "<group>";};
-B103 = {isa = PBXBuildFile; fileRef = A103;};
-A104 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>";};
-B104 = {isa = PBXBuildFile; fileRef = A104;};
-A105 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteReader.swift; sourceTree = "<group>";};
-B105 = {isa = PBXBuildFile; fileRef = A105;};
-A106 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>";};
-B106 = {isa = PBXBuildFile; fileRef = A106;};
-A110 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarIcon.swift; sourceTree = "<group>";};
-B110 = {isa = PBXBuildFile; fileRef = A110;};
-A111 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshot.swift; sourceTree = "<group>";};
-B111 = {isa = PBXBuildFile; fileRef = A111;};
-B211 = {isa = PBXBuildFile; fileRef = A111;};
-A112 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>";};
-B112 = {isa = PBXBuildFile; fileRef = A112;};
-A113 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>";};
-B113 = {isa = PBXBuildFile; fileRef = A113;};
-A200 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PajlotWidget.swift; sourceTree = "<group>";};
-B200 = {isa = PBXBuildFile; fileRef = A200;};
-C001 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>";};
-C003 = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>";};
-C004 = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PajlotAssist.entitlements; sourceTree = "<group>";};
-C005 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>";};
-C006 = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PajlotWidget.entitlements; sourceTree = "<group>";};
-B107 = {isa = PBXBuildFile; fileRef = C003;};
-C002 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PajlotAssist.app; sourceTree = BUILT_PRODUCTS_DIR;};
-C010 = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PajlotWidget.appex; sourceTree = BUILT_PRODUCTS_DIR;};
-B300 = {isa = PBXBuildFile; fileRef = C010; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); };};
-D001 = {isa = PBXGroup; children = (D002, D005, D003, D004); sourceTree = "<group>";};
-D002 = {isa = PBXGroup; children = (A100, A101, A102, A103, A104, A105, A106, A110, A111, A112, A113); name = PajlotAssist; path = Sources/PajlotAssist; sourceTree = "<group>";};
-D005 = {isa = PBXGroup; children = (A200); name = PajlotWidget; path = Sources/PajlotWidget; sourceTree = "<group>";};
-D003 = {isa = PBXGroup; children = (C001, C003, C004, D006); path = Resources; sourceTree = "<group>";};
-D006 = {isa = PBXGroup; children = (C005, C006); path = Widget; sourceTree = "<group>";};
-D004 = {isa = PBXGroup; children = (C002, C010); name = Products; sourceTree = "<group>";};
-E001 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B100, B101, B102, B103, B104, B105, B106, B110, B111, B112, B113); runOnlyForDeploymentPostprocessing = 0;};
-E003 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (B107); runOnlyForDeploymentPostprocessing = 0;};
-E002 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;};
-E004 = {isa = PBXCopyFilesBuildPhase; buildActionMask = 2147483647; dstPath = ""; dstSubfolderSpec = 13; files = (B300); name = "Embed Foundation Extensions"; runOnlyForDeploymentPostprocessing = 0;};
-E101 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B200, B211); runOnlyForDeploymentPostprocessing = 0;};
-E102 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;};
-E103 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;};
-K001 = {isa = PBXContainerItemProxy; containerPortal = H001; proxyType = 1; remoteGlobalIDString = F002; remoteInfo = PajlotWidget;};
-K002 = {isa = PBXTargetDependency; target = F002; targetProxy = K001;};
-F001 = {isa = PBXNativeTarget; buildConfigurationList = G002; buildPhases = (E001, E002, E003, E004); buildRules = (); dependencies = (K002); name = PajlotAssist; productName = PajlotAssist; productReference = C002; productType = "com.apple.product-type.application";};
-F002 = {isa = PBXNativeTarget; buildConfigurationList = G003; buildPhases = (E101, E102, E103); buildRules = (); dependencies = (); name = PajlotWidget; productName = PajlotWidget; productReference = C010; productType = "com.apple.product-type.app-extension";};
-H001 = {isa = PBXProject; attributes = {LastUpgradeCheck = 1600; TargetAttributes = {F001 = {DevelopmentTeam = RD223D229Z;}; F002 = {DevelopmentTeam = RD223D229Z;};};}; buildConfigurationList = G001; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = D001; productRefGroup = D004; projectDirPath = ""; projectRoot = ""; targets = (F001, F002);};
-ID1 = {isa = XCBuildConfiguration; buildSettings = {MACOSX_DEPLOYMENT_TARGET = 15.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; USE_HEADERMAP = NO; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; ONLY_ACTIVE_ARCH = YES; DEVELOPMENT_TEAM = RD223D229Z; CODE_SIGN_STYLE = Automatic; CODE_SIGN_IDENTITY = "Apple Development"; ENABLE_HARDENED_RUNTIME = NO;}; name = Debug;};
-ID2 = {isa = XCBuildConfiguration; buildSettings = {PRODUCT_BUNDLE_IDENTIFIER = se.humblebee.PajlotAssist; PRODUCT_NAME = PajlotAssist; INFOPLIST_FILE = Resources/Info.plist; CODE_SIGN_ENTITLEMENTS = Resources/PajlotAssist.entitlements; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; GENERATE_INFOPLIST_FILE = NO; ENABLE_APP_SANDBOX = NO; OTHER_LDFLAGS = "-lsqlite3"; LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";}; name = Debug;};
-ID3 = {isa = XCBuildConfiguration; buildSettings = {PRODUCT_BUNDLE_IDENTIFIER = se.humblebee.PajlotAssist.Widget; PRODUCT_NAME = PajlotWidget; INFOPLIST_FILE = Resources/Widget/Info.plist; CODE_SIGN_ENTITLEMENTS = Resources/Widget/PajlotWidget.entitlements; GENERATE_INFOPLIST_FILE = NO; ENABLE_APP_SANDBOX = YES; SKIP_INSTALL = YES; LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";}; name = Debug;};
-IR1 = {isa = XCBuildConfiguration; buildSettings = {MACOSX_DEPLOYMENT_TARGET = 15.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; USE_HEADERMAP = NO; SWIFT_COMPILATION_MODE = wholemodule; DEVELOPMENT_TEAM = RD223D229Z; CODE_SIGN_STYLE = Automatic; CODE_SIGN_IDENTITY = "Apple Development"; ENABLE_HARDENED_RUNTIME = NO;}; name = Release;};
-IR2 = {isa = XCBuildConfiguration; buildSettings = {PRODUCT_BUNDLE_IDENTIFIER = se.humblebee.PajlotAssist; PRODUCT_NAME = PajlotAssist; INFOPLIST_FILE = Resources/Info.plist; CODE_SIGN_ENTITLEMENTS = Resources/PajlotAssist.entitlements; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; GENERATE_INFOPLIST_FILE = NO; ENABLE_APP_SANDBOX = NO; OTHER_LDFLAGS = "-lsqlite3"; LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";}; name = Release;};
-IR3 = {isa = XCBuildConfiguration; buildSettings = {PRODUCT_BUNDLE_IDENTIFIER = se.humblebee.PajlotAssist.Widget; PRODUCT_NAME = PajlotWidget; INFOPLIST_FILE = Resources/Widget/Info.plist; CODE_SIGN_ENTITLEMENTS = Resources/Widget/PajlotWidget.entitlements; GENERATE_INFOPLIST_FILE = NO; ENABLE_APP_SANDBOX = YES; SKIP_INSTALL = YES; LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @executable_path/../../../../Frameworks";}; name = Release;};
-G001 = {isa = XCConfigurationList; buildConfigurations = (ID1, IR1); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
-G002 = {isa = XCConfigurationList; buildConfigurations = (ID2, IR2); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
-G003 = {isa = XCConfigurationList; buildConfigurations = (ID3, IR3); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;};
-}; rootObject = H001;}
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B100 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100 /* Actions.swift */; };
+		B101 /* EventTail.swift in Sources */ = {isa = PBXBuildFile; fileRef = A101 /* EventTail.swift */; };
+		B102 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A102 /* Models.swift */; };
+		B103 /* PajlotAssistApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A103 /* PajlotAssistApp.swift */; };
+		B104 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A104 /* PopoverView.swift */; };
+		B105 /* SQLiteReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A105 /* SQLiteReader.swift */; };
+		B106 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A106 /* SessionStore.swift */; };
+		B107 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C003 /* Assets.xcassets */; };
+		B110 /* MenuBarIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A110 /* MenuBarIcon.swift */; };
+		B111 /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A111 /* WidgetSnapshot.swift */; };
+		B112 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A112 /* Preferences.swift */; };
+		B113 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A113 /* WelcomeView.swift */; };
+		B200 /* PajlotWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200 /* PajlotWidget.swift */; };
+		B211 /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A111 /* WidgetSnapshot.swift */; };
+		B300 /* PajlotWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C010 /* PajlotWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FB00 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA00 /* Inter-Regular.ttf */; };
+		FB01 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA01 /* Inter-Medium.ttf */; };
+		FB02 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA02 /* Inter-SemiBold.ttf */; };
+		FB03 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA03 /* Inter-Bold.ttf */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		K001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = H001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F002;
+			remoteInfo = PajlotWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E004 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B300 /* PajlotWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A100 /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
+		A101 /* EventTail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTail.swift; sourceTree = "<group>"; };
+		A102 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		A103 /* PajlotAssistApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PajlotAssistApp.swift; sourceTree = "<group>"; };
+		A104 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
+		A105 /* SQLiteReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteReader.swift; sourceTree = "<group>"; };
+		A106 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		A110 /* MenuBarIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarIcon.swift; sourceTree = "<group>"; };
+		A111 /* WidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshot.swift; sourceTree = "<group>"; };
+		A112 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		A113 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		A200 /* PajlotWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PajlotWidget.swift; sourceTree = "<group>"; };
+		C001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C002 /* PajlotAssist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PajlotAssist.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C004 /* PajlotAssist.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PajlotAssist.entitlements; sourceTree = "<group>"; };
+		C005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C006 /* PajlotWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PajlotWidget.entitlements; sourceTree = "<group>"; };
+		C010 /* PajlotWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PajlotWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA00 /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
+		FA01 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
+		FA02 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		FA03 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E102 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D001 = {
+			isa = PBXGroup;
+			children = (
+				D002 /* PajlotAssist */,
+				D005 /* PajlotWidget */,
+				D003 /* Resources */,
+				D004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D002 /* PajlotAssist */ = {
+			isa = PBXGroup;
+			children = (
+				A100 /* Actions.swift */,
+				A101 /* EventTail.swift */,
+				A102 /* Models.swift */,
+				A103 /* PajlotAssistApp.swift */,
+				A104 /* PopoverView.swift */,
+				A105 /* SQLiteReader.swift */,
+				A106 /* SessionStore.swift */,
+				A110 /* MenuBarIcon.swift */,
+				A111 /* WidgetSnapshot.swift */,
+				A112 /* Preferences.swift */,
+				A113 /* WelcomeView.swift */,
+			);
+			name = PajlotAssist;
+			path = Sources/PajlotAssist;
+			sourceTree = "<group>";
+		};
+		D003 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C001 /* Info.plist */,
+				C003 /* Assets.xcassets */,
+				C004 /* PajlotAssist.entitlements */,
+				D006 /* Widget */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C002 /* PajlotAssist.app */,
+				C010 /* PajlotWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D005 /* PajlotWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A200 /* PajlotWidget.swift */,
+			);
+			name = PajlotWidget;
+			path = Sources/PajlotWidget;
+			sourceTree = "<group>";
+		};
+		D006 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				C005 /* Info.plist */,
+				C006 /* PajlotWidget.entitlements */,
+				FG00 /* Fonts */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		FG00 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				FA00 /* Inter-Regular.ttf */,
+				FA01 /* Inter-Medium.ttf */,
+				FA02 /* Inter-SemiBold.ttf */,
+				FA03 /* Inter-Bold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F001 /* PajlotAssist */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = G002 /* Build configuration list for PBXNativeTarget "PajlotAssist" */;
+			buildPhases = (
+				E001 /* Sources */,
+				E002 /* Frameworks */,
+				E003 /* Resources */,
+				E004 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				K002 /* PBXTargetDependency */,
+			);
+			name = PajlotAssist;
+			productName = PajlotAssist;
+			productReference = C002 /* PajlotAssist.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F002 /* PajlotWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = G003 /* Build configuration list for PBXNativeTarget "PajlotWidget" */;
+			buildPhases = (
+				E101 /* Sources */,
+				E102 /* Frameworks */,
+				E103 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PajlotWidget;
+			productName = PajlotWidget;
+			productReference = C010 /* PajlotWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		H001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2720;
+				TargetAttributes = {
+					F001 = {
+						DevelopmentTeam = RD223D229Z;
+					};
+					F002 = {
+						DevelopmentTeam = RD223D229Z;
+					};
+				};
+			};
+			buildConfigurationList = G001 /* Build configuration list for PBXProject "PajlotAssist" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D001;
+			productRefGroup = D004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F001 /* PajlotAssist */,
+				F002 /* PajlotWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B107 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E103 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB00 /* Inter-Regular.ttf in Resources */,
+				FB01 /* Inter-Medium.ttf in Resources */,
+				FB02 /* Inter-SemiBold.ttf in Resources */,
+				FB03 /* Inter-Bold.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B100 /* Actions.swift in Sources */,
+				B101 /* EventTail.swift in Sources */,
+				B102 /* Models.swift in Sources */,
+				B103 /* PajlotAssistApp.swift in Sources */,
+				B104 /* PopoverView.swift in Sources */,
+				B105 /* SQLiteReader.swift in Sources */,
+				B106 /* SessionStore.swift in Sources */,
+				B110 /* MenuBarIcon.swift in Sources */,
+				B111 /* WidgetSnapshot.swift in Sources */,
+				B112 /* Preferences.swift in Sources */,
+				B113 /* WelcomeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E101 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B200 /* PajlotWidget.swift in Sources */,
+				B211 /* WidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		K002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F002 /* PajlotWidget */;
+			targetProxy = K001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		ID1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = RD223D229Z;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		ID2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				STRIP_INSTALLED_PRODUCT = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = Resources/PajlotAssist.entitlements;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				OTHER_LDFLAGS = "-lsqlite3";
+				PRODUCT_BUNDLE_IDENTIFIER = se.humblebee.PajlotAssist;
+				PRODUCT_NAME = PajlotAssist;
+				REGISTER_APP_GROUPS = YES;
+			};
+			name = Debug;
+		};
+		ID3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				STRIP_INSTALLED_PRODUCT = NO;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = Resources/Widget/PajlotWidget.entitlements;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = se.humblebee.PajlotAssist.Widget;
+				PRODUCT_NAME = PajlotWidget;
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		IR1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = RD223D229Z;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
+		IR2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = Resources/PajlotAssist.entitlements;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				OTHER_LDFLAGS = "-lsqlite3";
+				PRODUCT_BUNDLE_IDENTIFIER = se.humblebee.PajlotAssist;
+				PRODUCT_NAME = PajlotAssist;
+				REGISTER_APP_GROUPS = YES;
+			};
+			name = Release;
+		};
+		IR3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = Resources/Widget/PajlotWidget.entitlements;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = se.humblebee.PajlotAssist.Widget;
+				PRODUCT_NAME = PajlotWidget;
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		G001 /* Build configuration list for PBXProject "PajlotAssist" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ID1 /* Debug */,
+				IR1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		G002 /* Build configuration list for PBXNativeTarget "PajlotAssist" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ID2 /* Debug */,
+				IR2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		G003 /* Build configuration list for PBXNativeTarget "PajlotWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ID3 /* Debug */,
+				IR3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = H001 /* Project object */;
+}

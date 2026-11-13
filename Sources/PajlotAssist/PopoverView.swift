@@ -10,15 +10,17 @@ enum Palette {
     }
     static func rgb(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat) -> NSColor { NSColor(srgbRed: r / 255, green: g / 255, blue: b / 255, alpha: 1) }
 
-    static let canvas   = adaptive(light: rgb(244, 244, 247), dark: rgb(24, 24, 27))
+    static let canvas   = adaptive(light: rgb(247, 247, 248), dark: rgb(24, 24, 26))
     static let card     = adaptive(light: .white, dark: rgb(36, 36, 40))
     static let well     = adaptive(light: NSColor(white: 0, alpha: 0.055), dark: NSColor(white: 1, alpha: 0.07))
     static let hairline = adaptive(light: NSColor(white: 0, alpha: 0.08), dark: NSColor(white: 1, alpha: 0.08))
 
-    static let accent    = adaptive(light: rgb(99, 82, 238), dark: rgb(150, 136, 255))
+    // Same scheme as the widgets: monochrome ink for chrome, one warm accent for "needs you", soft status hues.
+    static let accent    = adaptive(light: rgb(35, 35, 35), dark: rgb(242, 242, 244))
+    static let working   = adaptive(light: rgb(62, 115, 224), dark: rgb(112, 162, 255))
     static let accent2   = adaptive(light: rgb(52, 120, 246), dark: rgb(96, 160, 255))
-    static let attention = adaptive(light: rgb(232, 110, 18), dark: rgb(255, 159, 67))
-    static let ready     = adaptive(light: rgb(22, 156, 98), dark: rgb(64, 208, 140))
+    static let attention = adaptive(light: rgb(227, 110, 51), dark: rgb(255, 158, 102))
+    static let ready     = adaptive(light: rgb(44, 150, 124), dark: rgb(88, 204, 170))
     static let muted     = adaptive(light: rgb(142, 142, 150), dark: rgb(120, 120, 128))
 }
 
@@ -33,7 +35,7 @@ extension SessionStatus {
     var isLive: Bool { self == .working || self == .needsInput }
     var tint: Color {
         switch self {
-        case .working: Palette.accent
+        case .working: Palette.working
         case .needsInput: Palette.attention
         case .idle: Palette.ready
         case .stopped: Palette.muted
@@ -98,7 +100,7 @@ struct PopoverView: View {
 
     private var overallTint: Color {
         if store.needsInputCount > 0 { return Palette.attention }
-        if store.activeCount > 0 { return Palette.accent }
+        if store.activeCount > 0 { return Palette.working }
         if store.sessions.contains(where: { $0.status == .idle }) { return Palette.ready }
         return Palette.muted
     }
@@ -118,9 +120,6 @@ struct PopoverView: View {
     private var backdrop: some View {
         ZStack(alignment: .top) {
             Palette.canvas
-            LinearGradient(colors: [overallTint.opacity(0.13), overallTint.opacity(0)], startPoint: .top, endPoint: .bottom)
-                .frame(height: 150)
-                .animation(.easeInOut(duration: 0.6), value: store.needsInputCount)
         }
         .ignoresSafeArea()
     }
@@ -332,9 +331,8 @@ struct SessionCard: View {
         .background(cardBackground)
         .overlay(alignment: .leading) {
             if session.isActive {
-                UnevenRoundedRectangle(topLeadingRadius: Metrics.cardRadius, bottomLeadingRadius: Metrics.cardRadius, style: .continuous)
-                    .fill(tint)
-                    .frame(width: 4)
+                // Straight bar; the card's clipShape below rounds its ends to match the corners.
+                Rectangle().fill(tint).frame(width: 4)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous))
@@ -350,7 +348,7 @@ struct SessionCard: View {
         let shape = RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous)
         return shape
             .fill(Palette.card)
-            .overlay(shape.strokeBorder(session.isActive ? tint.opacity(0.45) : Palette.hairline, lineWidth: 1))
+            .overlay(shape.strokeBorder(needsYou ? tint.opacity(0.45) : Palette.hairline, lineWidth: 1))
     }
 
     /// Finished work keeps its steps and final note, so you can look back at what it did.
@@ -414,8 +412,8 @@ struct StatusPill: View {
         HStack(spacing: 4) {
             switch status {
             case .working:
-                SpinningArc(tint: .white, lineWidth: 1.6).frame(width: 9, height: 9)
-                    .background(Circle().stroke(.white.opacity(0.35), lineWidth: 1.6))
+                SpinningArc(tint: Palette.canvas, lineWidth: 1.6).frame(width: 9, height: 9)
+                    .background(Circle().stroke(Palette.canvas.opacity(0.35), lineWidth: 1.6))
             case .needsInput:
                 Image(systemName: "hand.raised.fill").font(.system(size: 8.5, weight: .bold))
             case .idle:
@@ -426,11 +424,19 @@ struct StatusPill: View {
             Text(status.label)
         }
         .font(.system(size: 10.5, weight: .semibold))
-        .foregroundStyle(status.isLive ? Color.white : status.tint)
+        .foregroundStyle(pillText)
         .padding(.horizontal, 8)
         .frame(height: 20)
-        .background(Capsule().fill(status.isLive ? AnyShapeStyle(status.tint.gradient) : AnyShapeStyle(status.tint.opacity(0.14))))
+        .background(Capsule().fill(pillFill))
         .fixedSize()
+    }
+
+    // Colour is kept for the status lines and for "needs you"; the pills stay neutral.
+    private var pillText: Color {
+        switch status { case .working: Palette.canvas; case .needsInput: .white; default: Color.secondary }
+    }
+    private var pillFill: Color {
+        switch status { case .working: Palette.accent; case .needsInput: status.tint; default: Palette.well }
     }
 }
 
@@ -562,7 +568,7 @@ struct ProgressTrack: View {
             ZStack(alignment: .leading) {
                 Capsule().fill(Palette.well)
                 Capsule()
-                    .fill(LinearGradient(colors: [tint.opacity(0.7), tint], startPoint: .leading, endPoint: .trailing))
+                    .fill(tint)
                     .frame(width: max(5, g.size.width * value))
             }
         }
@@ -715,7 +721,7 @@ struct PillButtonStyle: ButtonStyle {
                 .frame(height: 26)
                 .background {
                     if filled {
-                        Capsule().fill(tint.gradient)
+                        Capsule().fill(tint)
                             .overlay(Capsule().strokeBorder(.white.opacity(0.2), lineWidth: 1))
                             .shadow(color: tint.opacity(0.35), radius: hover ? 6 : 3, y: 1)
                     } else {
