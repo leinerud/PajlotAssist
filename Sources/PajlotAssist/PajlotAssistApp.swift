@@ -1,12 +1,38 @@
 import SwiftUI
 import AppKit
+import Combine
 
 @main
 struct PajlotAssistApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var store = SessionStore()
+    @AppStorage(Prefs.menuBar) private var showInMenuBar = true
 
     var body: some Scene {
-        MenuBarExtra {
+        // The Dock window: the same view as the menu bar popover, in a regular window.
+        // It opens at launch only for Dock users who are past the welcome screen.
+        Window("Pajlot Assist", id: MainWindow.id) {
+            PopoverView(resizable: true).environmentObject(store).registersWindowOpener()
+        }
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: Metrics.width, height: 520)
+        .defaultPosition(.topTrailing)
+        .defaultLaunchBehavior(Prefs.hasSeenWelcome && Prefs.showInDock ? .presented : .suppressed)
+
+        // First-launch splash: pick Dock and/or menu bar, and learn about the widget.
+        Window("Welcome to Pajlot Assist", id: WelcomeView.windowID) {
+            WelcomeView().registersWindowOpener()
+        }
+        .windowResizability(.contentSize)
+        .windowStyle(.hiddenTitleBar)
+        .defaultPosition(.center)
+        .defaultLaunchBehavior(Prefs.hasSeenWelcome ? .suppressed : .presented)
+
+        Settings {
+            SettingsView()
+        }
+
+        MenuBarExtra(isInserted: $showInMenuBar) {
             PopoverView().environmentObject(store)
         } label: {
             MenuBarLabel().environmentObject(store)
@@ -15,67 +41,62 @@ struct PajlotAssistApp: App {
     }
 }
 
+enum MainWindow {
+    static let id = "main"
+    /// Set by whichever SwiftUI view is alive, so AppKit callbacks (Dock clicks) can open the window.
+    @MainActor static var open: (() -> Void)?
+}
+
+private struct WindowOpenerRegistration: ViewModifier {
+    @Environment(\.openWindow) private var openWindow
+    func body(content: Content) -> some View {
+        content.onAppear {
+            let open = openWindow
+            MainWindow.open = { open(id: MainWindow.id); NSApp.activate() }
+        }
+    }
+}
+
+extension View {
+    func registersWindowOpener() -> some View { modifier(WindowOpenerRegistration()) }
+}
+
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        Prefs.registerDefaults()
+        Prefs.applyDockPolicy()
+    }
+    /// Clicking the Dock icon (or the desktop widget) brings the window back if it was closed.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        if !hasVisibleWindows { MainActor.assumeIsolated { MainWindow.open?() } }
+        return true
+    }
+    /// Closing the window keeps the app running (in the menu bar and/or Dock).
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+}
+
 struct MenuBarLabel: View {
     @EnvironmentObject var store: SessionStore
+    @StateObject private var animator = MenuBarIconAnimator()
     private let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
 
-    private var workingCount: Int { store.sessions.filter { $0.status == .working }.count }
+    private var mode: MenuBarIconMode {
+        if store.needsInputCount > 0 { return .needsInput }
+        if store.sessions.contains(where: { $0.status == .working }) { return .working }
+        if store.doneAt != nil { return .done }
+        return .idle
+    }
 
     var body: some View {
         HStack(spacing: 3) {
-            Image(nsImage: icon)
+            Image(nsImage: animator.image)
             if store.activeCount > 0 { Text("\(store.activeCount)") }
         }
+        .onAppear { animator.set(mode) }
+        .registersWindowOpener()
+        .onChange(of: mode) { _, new in animator.set(new) }
         .onReceive(timer) { _ in
             if let d = store.doneAt, Date().timeIntervalSince(d) > 120 { store.doneAt = nil }
         }
-    }
-
-    private var icon: NSImage {
-        if store.needsInputCount > 0 {
-            // Blink the speech bubble so it catches the eye.
-            let name = "bubble.left.fill"
-            let img = NSImage(systemSymbolName: name, accessibilityDescription: "Copilot needs you") ?? NSImage()
-            img.isTemplate = true
-            return img
-        }
-        if workingCount > 0 { return Self.spinner(frame: 0) }
-        if store.doneAt != nil {
-            let img = NSImage(systemSymbolName: "checkmark.circle.fill", accessibilityDescription: "Copilot finished") ?? NSImage()
-            img.isTemplate = true
-            return img
-        }
-        let name = store.activeCount > 0 ? "sparkles" : "moon.zzz"
-        let img = NSImage(systemSymbolName: name, accessibilityDescription: "Copilot") ?? NSImage()
-        img.isTemplate = true
-        return img
-    }
-
-    /// A sparkle in the middle of a ring with a rotating arc, so activity is visible at a glance.
-    static func spinner(frame: Int) -> NSImage {
-        let size = NSSize(width: 18, height: 18)
-        let img = NSImage(size: size, flipped: false) { rect in
-            NSColor.black.setStroke(); NSColor.black.setFill()
-            let c = NSPoint(x: rect.midX, y: rect.midY)
-            let ring = NSBezierPath()
-            ring.appendArc(withCenter: c, radius: 7.5, startAngle: 0, endAngle: 360)
-            ring.lineWidth = 1; NSColor.black.withAlphaComponent(0.3).setStroke(); ring.stroke()
-            let start = CGFloat(-frame * 30)
-            let arc = NSBezierPath()
-            arc.appendArc(withCenter: c, radius: 7.5, startAngle: start, endAngle: start - 100, clockwise: true)
-            arc.lineWidth = 2; arc.lineCapStyle = .round; NSColor.black.setStroke(); arc.stroke()
-            // 4-point sparkle
-            let r: CGFloat = 3.6, k: CGFloat = 0.9
-            let star = NSBezierPath()
-            star.move(to: NSPoint(x: c.x, y: c.y + r))
-            star.curve(to: NSPoint(x: c.x + r, y: c.y), controlPoint1: NSPoint(x: c.x + k, y: c.y + k), controlPoint2: NSPoint(x: c.x + k, y: c.y + k))
-            star.curve(to: NSPoint(x: c.x, y: c.y - r), controlPoint1: NSPoint(x: c.x + k, y: c.y - k), controlPoint2: NSPoint(x: c.x + k, y: c.y - k))
-            star.curve(to: NSPoint(x: c.x - r, y: c.y), controlPoint1: NSPoint(x: c.x - k, y: c.y - k), controlPoint2: NSPoint(x: c.x - k, y: c.y - k))
-            star.curve(to: NSPoint(x: c.x, y: c.y + r), controlPoint1: NSPoint(x: c.x - k, y: c.y + k), controlPoint2: NSPoint(x: c.x - k, y: c.y + k))
-            star.fill()
-            return true
-        }
-        img.isTemplate = true
-        return img
     }
 }

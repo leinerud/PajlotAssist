@@ -1,0 +1,349 @@
+{
+  "version": "2.22",
+  "children": [
+    {
+      "type": "frame",
+      "id": "WkSaC",
+      "x": -1378,
+      "y": -1755,
+      "name": "PajlotAssist icon",
+      "clip": true,
+      "width": 1024,
+      "height": 1024,
+      "fill": "#272425ff",
+      "layout": "none",
+      "children": [
+        {
+          "type": "group",
+          "id": "gjdYp",
+          "x": 0,
+          "y": 0,
+          "name": "Status ring",
+          "children": [
+            {
+              "type": "path",
+              "id": "uWuQJ",
+              "x": 0,
+              "y": 0,
+              "name": "Progress arc",
+              "geometry": "M512 301.3a210.7 210.7 0 1 1-210.7 210.7",
+              "viewBox": [
+                0,
+                0,
+                1024,
+                1024
+              ],
+              "width": 1024,
+              "height": 1024,
+              "stroke": "#ffffffff",
+              "strokeWidth": 76,
+              "strokeLinecap": "round"
+            },
+            {
+              "type": "ellipse",
+              "id": "A16i7x",
+              "x": 325,
+              "y": 325,
+              "name": "Next step",
+              "fill": "#ffffffff",
+              "width": 76,
+              "height": 76
+            },
+            {
+              "type": "ellipse",
+              "id": "I5h6I",
+              "x": 442,
+              "y": 442,
+              "name": "Session",
+              "fill": "#ffffffff",
+              "width": 140,
+              "height": 140
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "fjTs5",
+      "x": 354,
+      "y": -512,
+      "name": "NotchPal",
+      "width": 1024,
+      "height": 1024,
+      "fill": "#272425ff",
+      "layout": "none",
+      "children": [
+        {
+          "type": "group",
+          "id": "JtILa",
+          "x": 0,
+          "y": 0,
+          "name": "Group 614",
+          "enabled": false,
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "l0Q6U",
+              "x": 0,
+              "y": 0,
+              "name": "Rectangle 1487",
+              "fill": "#ec434aff",
+              "width": 1024,
+              "height": 170.6666717529297
+            },
+            {
+              "type": "rectangle",
+              "id": "ysIIf",
+              "x": 0,
+              "y": 512,
+              "name": "Rectangle 1490",
+              "fill": "#89c925ff",
+              "width": 1024,
+              "height": 170.6666717529297
+            },
+            {
+              "type": "rectangle",
+              "id": "BbipH",
+              "x": 0,
+              "y": 170.6640625,
+              "name": "Rectangle 1488",
+              "fill": "#f78a4cff",
+              "width": 1024,
+              "height": 170.6666717529297
+            },
+            {
+              "type": "rectangle",
+              "id": "cWZiA",
+              "x": 0,
+              "y": 682.6640625,
+              "name": "Rectangle 1491",
+              "fill": "#1a82c2ff",
+              "width": 1024,
+              "height": 170.6666717529297
+            },
+            {
+              "type": "rectangle",
+              "id": "AJKTN",
+              "x": 0,
+              "y": 341.3359375,
+              "name": "Rectangle 1489",
+              "fill": "#ffc93cff",
+              "width": 1024,
+              "height": 170.6666717529297
+            },
+            {
+              "type": "rectangle",
+              "id": "mx9s8",
+              "x": 0,
+              "y": 853.3359375,
+              "name": "Rectangle 1492",
+              "fill": "#6a4c92ff",
+              "width": 1024,
+              "height": 170.6666717529297
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 49,
+          "id": "Qwe5z",
+          "x": 263,
+          "y": 263,
+          "name": "White bg",
+          "fill": "#ffffffff",
+          "width": 497.4200134277344,
+          "height": 497.4200134277344
+        },
+        {
+          "type": "group",
+          "id": "g93AB",
+          "x": 401,
+          "y": 227,
+          "name": "Mochi",
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": [
+                0,
+                0,
+                49,
+                49
+              ],
+              "id": "VRJKP",
+              "x": 0,
+              "y": 0,
+              "name": "Body",
+              "fill": "#272425ff",
+              "width": 221,
+              "height": 154
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "cornerRadius": 4,
+              "id": "KFhNV",
+              "x": 82,
+              "y": 183,
+              "name": "Ear",
+              "rotation": 179.99999499104388,
+              "fill": "#272425ff",
+              "width": 42.000003814697266,
+              "height": 46.999996185302734
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "cornerRadius": 4,
+              "id": "nSJ4n",
+              "x": 182,
+              "y": 183,
+              "name": "Ear",
+              "rotation": 179.99999499104388,
+              "fill": "#272425ff",
+              "width": 42.000003814697266,
+              "height": 46.999996185302734
+            },
+            {
+              "type": "group",
+              "id": "m24r9m",
+              "x": 53.999999999992724,
+              "y": 65,
+              "name": "Eyes",
+              "children": [
+                {
+                  "type": "group",
+                  "id": "D10X2",
+                  "x": 0,
+                  "y": 0,
+                  "name": "Eye",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "EYB0O",
+                      "x": 0,
+                      "y": 0,
+                      "name": "Ellipse 1024",
+                      "sweepAngle": -360.00001001791264,
+                      "fill": "#ffffffff",
+                      "width": 28.5,
+                      "height": 36
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "LSGQF",
+                      "x": 10.500000000007276,
+                      "y": 7.5,
+                      "name": "Ellipse 1025",
+                      "sweepAngle": -360.00001001791264,
+                      "fill": "#272425ff",
+                      "width": 16.5,
+                      "height": 16.5
+                    }
+                  ]
+                },
+                {
+                  "type": "group",
+                  "id": "A86uS",
+                  "x": 86,
+                  "y": 0,
+                  "name": "Eye",
+                  "children": [
+                    {
+                      "type": "group",
+                      "id": "u8Dji2",
+                      "x": 0,
+                      "y": 0,
+                      "name": "Group 1000001942",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "w6NRY",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Ellipse 1024",
+                          "sweepAngle": -360.00001001791264,
+                          "fill": "#ffffffff",
+                          "width": 28.5,
+                          "height": 36
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "p3a6Al",
+                          "x": 10.500000000007276,
+                          "y": 7.5,
+                          "name": "Ellipse 1025",
+                          "sweepAngle": -360.00001001791264,
+                          "fill": "#272425ff",
+                          "width": 16.5,
+                          "height": 16.5
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "yKc1h",
+      "x": -1378,
+      "y": -512,
+      "name": "WidgetNinja icon",
+      "clip": true,
+      "width": 1024,
+      "height": 1024,
+      "fill": "#272425ff",
+      "layout": "none",
+      "children": [
+        {
+          "type": "group",
+          "id": "jGqh9",
+          "x": 263.29058837890625,
+          "y": 263.29195165634155,
+          "name": "Group 1000001937",
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 26.169620513916016,
+              "id": "y7rkH",
+              "x": 0.0017299652099609375,
+              "y": 273.7077126502991,
+              "name": "Rectangle 1741",
+              "fill": "#ffffffff",
+              "width": 223.70803833007812,
+              "height": 223.70803833007812
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 26.169620513916016,
+              "id": "BOl59",
+              "x": 273.70703125,
+              "y": 273.70804834365845,
+              "name": "Rectangle 1742",
+              "fill": "#ffffffff",
+              "width": 223.70803833007812,
+              "height": 223.70803833007812
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 26.169620513916016,
+              "id": "rDxmZ",
+              "x": 0,
+              "y": 0,
+              "name": "Rectangle 1743",
+              "fill": "#ffffffff",
+              "width": 495.22265625,
+              "height": 223.70803833007812
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fileToken": "946da4a6-b438-4e85-90b6-bf01f24ebee3"
+}

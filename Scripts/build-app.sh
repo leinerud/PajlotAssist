@@ -1,24 +1,10 @@
 #!/bin/bash
-# Builds PajlotAssist.app (menu bar only, no Dock icon) into ./build
+# Builds PajlotAssist.app (Dock + menu bar app with its desktop widget) into ./build
 set -euo pipefail
 cd "$(dirname "$0")/.."
-swift build -c release --scratch-path "${TMPDIR:-/tmp}/pajlot-build"
-BIN="$(swift build -c release --scratch-path "${TMPDIR:-/tmp}/pajlot-build" --show-bin-path)/PajlotAssist"
-APP="build/PajlotAssist.app"
-rm -rf "$APP"; mkdir -p "$APP/Contents/MacOS"
-cp "$BIN" "$APP/Contents/MacOS/PajlotAssist"
-cat > "$APP/Contents/Info.plist" <<P
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-<key>CFBundleIdentifier</key><string>se.humblebee.PajlotAssist</string>
-<key>CFBundleName</key><string>Pajlot Assist</string>
-<key>CFBundleExecutable</key><string>PajlotAssist</string>
-<key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>0.1</string>
-<key>LSMinimumSystemVersion</key><string>14.0</string>
-<key>LSUIElement</key><true/>
-</dict></plist>
-P
-codesign --force --sign - "$APP"
-echo "Built $APP"
+DD="${TMPDIR:-/tmp}/pajlot-dd"
+xcodebuild -project PajlotAssist.xcodeproj -scheme PajlotAssist -configuration Release \
+  -derivedDataPath "$DD" -allowProvisioningUpdates build | grep -E "error|BUILD" || true
+rm -rf build/PajlotAssist.app; mkdir -p build
+cp -R "$DD/Build/Products/Release/PajlotAssist.app" build/
+echo "Built build/PajlotAssist.app"
