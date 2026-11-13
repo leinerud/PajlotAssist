@@ -6,9 +6,9 @@ enum SessionStatus: String {
     var label: String {
         switch self {
         case .working: "Working"
-        case .needsInput: "Needs your input"
-        case .idle: "Ready"
-        case .stopped: "Finished"
+        case .needsInput: "Needs you"
+        case .idle: "Done"
+        case .stopped: "Closed"
         }
     }
     var sortRank: Int {

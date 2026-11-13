@@ -27,11 +27,10 @@ enum Metrics {
     static let gutter: CGFloat = 14
     static let cardRadius: CGFloat = 14
     static let maxListHeight: CGFloat = 540
-    static let icon: CGFloat = 28
-    static let iconGap: CGFloat = 11
 }
 
 extension SessionStatus {
+    var isLive: Bool { self == .working || self == .needsInput }
     var tint: Color {
         switch self {
         case .working: Palette.accent
@@ -42,7 +41,7 @@ extension SessionStatus {
     }
     var symbol: String {
         switch self {
-        case .working: "sparkles"
+        case .working: "ellipsis"
         case .needsInput: "hand.raised.fill"
         case .idle: "checkmark"
         case .stopped: "flag.checkered"
@@ -51,9 +50,9 @@ extension SessionStatus {
     var sectionTitle: String {
         switch self {
         case .needsInput: "Needs you"
-        case .working: "In progress"
-        case .idle: "Ready for more"
-        case .stopped: "Finished"
+        case .working: "Working now"
+        case .idle: "Done"
+        case .stopped: "Closed"
         }
     }
 }
@@ -115,11 +114,10 @@ struct PopoverView: View {
 
     private var header: some View {
         HStack(spacing: 11) {
-            AppGlyph(alert: store.needsInputCount > 0)
             VStack(alignment: .leading, spacing: 1) {
-                Text("Copilot")
+                Text("Sessions")
                     .font(.system(size: 14, weight: .semibold))
-                    .help("Each item is one conversation (a “session”) you've had with GitHub Copilot.")
+                    .help("Each item is one chat you've started (a “session”).")
                 Text(summaryLine)
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
@@ -137,10 +135,13 @@ struct PopoverView: View {
 
     private var summaryLine: String {
         let n = store.needsInputCount, a = store.activeCount
-        if n > 0 { return n == 1 ? "1 needs your answer" : "\(n) need your answer" }
-        if a > 0 { return a == 1 ? "Working on 1 thing" : "Working on \(a) things" }
-        if store.sessions.contains(where: { $0.status == .idle }) { return "All quiet · Ready for your next request" }
-        return "Nothing running right now"
+        let w = a - n
+        let d = store.sessions.filter { $0.status == .idle }.count
+        var parts: [String] = []
+        if n > 0 { parts.append(n == 1 ? "1 needs you" : "\(n) need you") }
+        if w > 0 { parts.append("\(w) working") }
+        if d > 0 { parts.append("\(d) done") }
+        return parts.isEmpty ? "Nothing running right now" : parts.joined(separator: " · ")
     }
 
     // MARK: List
@@ -177,16 +178,16 @@ struct PopoverView: View {
             ZStack {
                 Circle().fill(Palette.accent.opacity(0.07)).frame(width: 72, height: 72)
                 Circle().fill(Palette.accent.opacity(0.12)).frame(width: 48, height: 48)
-                Image(systemName: isNow ? "moon.stars.fill" : "sparkles")
+                Image(systemName: isNow ? "moon.stars.fill" : "tray")
                     .font(.system(size: 19, weight: .semibold))
                     .foregroundStyle(Palette.accent)
             }
             .padding(.bottom, 4)
-            Text(isNow ? "Nothing in progress" : "No Copilot work yet")
+            Text(isNow ? "Nothing in progress" : "No sessions yet")
                 .font(.system(size: 13, weight: .semibold))
             Text(isNow
-                 ? "When you ask Copilot to do something, it shows up here."
-                 : "Open GitHub Copilot and start a chat. It will appear here automatically.")
+                 ? "When you start a task, it shows up here."
+                 : "Start a chat in the GitHub app. It will appear here automatically.")
                 .font(.system(size: 11.5))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -208,12 +209,12 @@ struct PopoverView: View {
         HStack(spacing: 2) {
             Button { SessionActions.openCopilot() } label: {
                 HStack(spacing: 5) {
-                    Text("Open GitHub Copilot")
+                    Text("Open GitHub app")
                     Image(systemName: "arrow.up.right").font(.system(size: 8.5, weight: .bold))
                 }
             }
             .buttonStyle(FooterLinkStyle())
-            .help("Opens the Copilot app so you can chat with it")
+            .help("Opens the GitHub app so you can chat")
 
             Spacer()
 
@@ -223,7 +224,7 @@ struct PopoverView: View {
                 withAnimation(.easeInOut(duration: 0.6)) { spin += 360 }
                 store.refresh()
             }
-            IconButton(symbol: "power", help: "Close this helper (Copilot itself keeps running)", shortcut: "q") {
+            IconButton(symbol: "power", help: "Close this helper (your sessions keep running)", shortcut: "q") {
                 NSApplication.shared.terminate(nil)
             }
         }
@@ -237,6 +238,9 @@ struct PopoverView: View {
 
 // MARK: - Session card
 
+/// One session, reduced to what you need at a glance: what it is, its state, and
+/// (only when relevant) the question waiting for you or how far along the work is.
+/// Click anywhere on the card to open the session.
 struct SessionCard: View {
     let session: CopilotSession
     @State private var expanded = false
@@ -246,88 +250,74 @@ struct SessionCard: View {
     private var needsYou: Bool { session.status == .needsInput }
 
     var body: some View {
-        HStack(alignment: .top, spacing: Metrics.iconGap) {
-            StatusIcon(status: session.status)
-            VStack(alignment: .leading, spacing: 10) {
-                titleBlock
-                if let q = session.question { QuestionCallout(text: q, tint: tint) }
-                progress
-                if session.question == nil, let m = session.lastMessage, session.status != .working || session.todos.isEmpty {
-                    Text(m)
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                        .lineSpacing(1.5)
-                        .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(session.title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(session.isActive ? .primary : .secondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 4)
+                StatusPill(status: session.status)
+            }
+
+            HStack(spacing: 5) {
+                Text(session.repoShortName).lineLimit(1)
+                Text("·").foregroundStyle(.quaternary)
+                Text(session.updatedAt, format: .relative(presentation: .numeric, unitsStyle: .abbreviated))
+                    .monospacedDigit().lineLimit(1).fixedSize()
+                Spacer(minLength: 4)
+                MoreMenu(session: session).opacity(hovering ? 1 : 0)
+            }
+            .font(.system(size: 11))
+            .foregroundStyle(.secondary)
+            .frame(height: 16)
+            .help(session.branch.map { "Project: \(session.repoShortName) · Branch: \($0)" } ?? "Project: \(session.repoShortName)")
+
+            if let q = session.question { QuestionCallout(text: q, tint: tint) }
+            if session.status == .working { progress }
+            if expanded && !session.todos.isEmpty {
+                StepList(todos: session.todos, tint: tint)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+
+            if needsYou {
+                Button { SessionActions.openCopilot() } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "arrowshape.turn.up.left.fill").font(.system(size: 9.5, weight: .bold))
+                        Text("Answer")
+                    }
                 }
-                if expanded && !session.todos.isEmpty {
-                    StepList(todos: session.todos, tint: tint)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                }
-                actions.padding(.top, 2)
+                .buttonStyle(PillButtonStyle(tint: tint, filled: true))
+                .help("Open this session to answer")
+                .padding(.top, 2)
             }
         }
-        .padding(13)
+        .padding(.vertical, 12)
+        .padding(.leading, session.isActive ? 16 : 14)
+        .padding(.trailing, 14)
         .background(cardBackground)
+        .overlay(alignment: .leading) {
+            if session.isActive {
+                UnevenRoundedRectangle(topLeadingRadius: Metrics.cardRadius, bottomLeadingRadius: Metrics.cardRadius, style: .continuous)
+                    .fill(tint)
+                    .frame(width: 4)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous))
+        .shadow(color: needsYou ? tint.opacity(0.18) : .black.opacity(hovering ? 0.10 : 0.045),
+                radius: hovering ? 10 : 4, y: hovering ? 4 : 1)
         .contentShape(RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous))
+        .onTapGesture { SessionActions.openCopilot() }
         .onHover { h in withAnimation(.easeOut(duration: 0.15)) { hovering = h } }
+        .help("Click to open this session")
     }
 
     private var cardBackground: some View {
         let shape = RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous)
         return shape
             .fill(Palette.card)
-            .overlay(shape.strokeBorder(needsYou ? tint.opacity(0.55) : Palette.hairline, lineWidth: 1))
-            .shadow(color: needsYou ? tint.opacity(0.18) : .black.opacity(hovering ? 0.10 : 0.045),
-                    radius: hovering ? 10 : 4, y: hovering ? 4 : 1)
-    }
-
-    private var titleBlock: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(session.title)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(session.status == .stopped ? .secondary : .primary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 4)
-                Text(session.updatedAt, format: .relative(presentation: .numeric, unitsStyle: .abbreviated))
-                    .font(.system(size: 10.5).monospacedDigit())
-                    .foregroundStyle(.tertiary)
-            }
-
-            HStack(spacing: 5) {
-                Image(systemName: "folder").font(.system(size: 9.5, weight: .medium))
-                Text(session.repoShortName).lineLimit(1)
-                    .help("The project Copilot is working in")
-                if let b = session.branch {
-                    Text("·").foregroundStyle(.quaternary)
-                    Image(systemName: "arrow.triangle.branch").font(.system(size: 9.5, weight: .medium))
-                    Text(b)
-                        .font(.system(size: 10.5, design: .monospaced))
-                        .lineLimit(1).truncationMode(.middle)
-                        .help("Your own copy of the project to experiment in (called a “branch”). Your changes don't affect the main version until they're reviewed.")
-                }
-            }
-            .font(.system(size: 11))
-            .foregroundStyle(.secondary)
-
-            (Text(session.status.label).foregroundStyle(tint).fontWeight(.semibold)
-             + Text("  ·  ").foregroundStyle(.quaternary)
-             + Text(nextStep).foregroundStyle(.tertiary))
-                .font(.system(size: 10.5))
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 1)
-        }
-    }
-
-    private var nextStep: String {
-        switch session.status {
-        case .needsInput: "Open Copilot to answer."
-        case .working: "You can keep working while it finishes."
-        case .idle: "Give it the next task in Copilot."
-        case .stopped: "Start a new chat in Copilot to continue."
-        }
+            .overlay(shape.strokeBorder(session.isActive ? tint.opacity(0.45) : Palette.hairline, lineWidth: 1))
     }
 
     @ViewBuilder private var progress: some View {
@@ -335,15 +325,11 @@ struct SessionCard: View {
             VStack(alignment: .leading, spacing: 7) {
                 ProgressTrack(value: p, tint: tint)
                 HStack(spacing: 8) {
-                    Text(session.status == .working
-                         ? (session.currentTodo?.title ?? session.activity)
-                         : "\(session.doneCount) of \(session.todos.count) steps done")
-                        .lineLimit(1)
+                    Text(session.currentTodo?.title ?? session.activity).lineLimit(1)
                     Spacer(minLength: 4)
                     Button { withAnimation(.snappy) { expanded.toggle() } } label: {
                         HStack(spacing: 4) {
-                            Text("Steps").fontWeight(.medium)
-                            Text("\(session.doneCount)/\(session.todos.count)").monospacedDigit().foregroundStyle(.tertiary)
+                            Text("\(session.doneCount)/\(session.todos.count)").monospacedDigit()
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 8.5, weight: .bold))
                                 .rotationEffect(.degrees(expanded ? 180 : 0))
@@ -353,67 +339,46 @@ struct SessionCard: View {
                         .contentShape(Capsule())
                     }
                     .buttonStyle(.plain)
-                    .help("Copilot's to-do list for this task")
+                    .help("Show the steps for this task")
                 }
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary)
             }
-        } else if session.status == .working {
+        } else {
             HStack(spacing: 7) {
                 ProgressView().controlSize(.mini)
                 Text(session.activity).font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1)
             }
         }
     }
-
-    private var actions: some View {
-        HStack(spacing: 2) {
-            Button { SessionActions.openCopilot() } label: {
-                HStack(spacing: 5) {
-                    Image(systemName: needsYou ? "arrowshape.turn.up.left.fill" : "arrow.up.forward")
-                        .font(.system(size: 9.5, weight: .bold))
-                    Text(needsYou ? "Answer in Copilot" : "Open in Copilot")
-                }
-            }
-            .buttonStyle(PillButtonStyle(tint: needsYou ? tint : Palette.accent, filled: needsYou))
-            .help("Open the Copilot app")
-
-            Spacer(minLength: 0)
-
-            Group {
-                IconButton(symbol: "folder", help: "Show project files in Finder") { SessionActions.showInFinder(session) }
-                IconButton(symbol: "chevron.left.forwardslash.chevron.right", help: "Open in code editor") { SessionActions.openInEditor(session) }
-                MoreMenu(session: session)
-            }
-            .opacity(hovering ? 1 : 0.6)
-        }
-    }
 }
 
 // MARK: - Components
 
-/// The app's mark: a soft gradient tile with a sparkle, with a small dot when something needs you.
-struct AppGlyph: View {
-    let alert: Bool
+/// Big, unmistakable state label: a live spinner while working, a check once done.
+struct StatusPill: View {
+    let status: SessionStatus
     var body: some View {
-        RoundedRectangle(cornerRadius: 9, style: .continuous)
-            .fill(LinearGradient(colors: [Palette.accent, Palette.accent2], startPoint: .topLeading, endPoint: .bottomTrailing))
-            .overlay(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .strokeBorder(LinearGradient(colors: [.white.opacity(0.35), .white.opacity(0.05)], startPoint: .top, endPoint: .bottom), lineWidth: 1)
-            )
-            .overlay(Image(systemName: "sparkles").font(.system(size: 14, weight: .semibold)).foregroundStyle(.white))
-            .frame(width: 32, height: 32)
-            .shadow(color: Palette.accent.opacity(0.35), radius: 6, y: 2)
-            .overlay(alignment: .topTrailing) {
-                if alert {
-                    Circle().fill(Palette.attention)
-                        .frame(width: 10, height: 10)
-                        .overlay(Circle().strokeBorder(Palette.canvas, lineWidth: 2))
-                        .offset(x: 3, y: -3)
-                        .transition(.scale.combined(with: .opacity))
-                }
+        HStack(spacing: 4) {
+            switch status {
+            case .working:
+                SpinningArc(tint: .white, lineWidth: 1.6).frame(width: 9, height: 9)
+                    .background(Circle().stroke(.white.opacity(0.35), lineWidth: 1.6))
+            case .needsInput:
+                Image(systemName: "hand.raised.fill").font(.system(size: 8.5, weight: .bold))
+            case .idle:
+                Image(systemName: "checkmark").font(.system(size: 8.5, weight: .heavy))
+            case .stopped:
+                Image(systemName: "checkmark").font(.system(size: 8.5, weight: .heavy))
             }
+            Text(status.label)
+        }
+        .font(.system(size: 10.5, weight: .semibold))
+        .foregroundStyle(status.isLive ? Color.white : status.tint)
+        .padding(.horizontal, 8)
+        .frame(height: 20)
+        .background(Capsule().fill(status.isLive ? AnyShapeStyle(status.tint.gradient) : AnyShapeStyle(status.tint.opacity(0.14))))
+        .fixedSize()
     }
 }
 
@@ -473,43 +438,16 @@ struct SectionHeader: View {
     }
 }
 
-/// Tinted circle with the status symbol; animated while Copilot works or waits for you.
-struct StatusIcon: View {
-    let status: SessionStatus
-    var body: some View {
-        ZStack {
-            if status == .needsInput { PulseRing(tint: status.tint) }
-            Circle().fill(status.tint.opacity(0.14))
-            Image(systemName: status.symbol)
-                .font(.system(size: 11.5, weight: .bold))
-                .foregroundStyle(status.tint)
-            if status == .working { SpinningArc(tint: status.tint) }
-        }
-        .frame(width: Metrics.icon, height: Metrics.icon)
-    }
-}
-
 struct SpinningArc: View {
     let tint: Color
+    var lineWidth: CGFloat = 2
     var body: some View {
         TimelineView(.animation) { ctx in
             let t = ctx.date.timeIntervalSinceReferenceDate
             Circle()
                 .trim(from: 0, to: 0.3)
-                .stroke(tint, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .stroke(tint, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(t.truncatingRemainder(dividingBy: 1.1) / 1.1 * 360))
-        }
-    }
-}
-
-struct PulseRing: View {
-    let tint: Color
-    var body: some View {
-        TimelineView(.animation) { ctx in
-            let phase = ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1.8) / 1.8
-            Circle()
-                .stroke(tint.opacity(0.5 * (1 - phase)), lineWidth: 1.5)
-                .scaleEffect(1 + phase * 0.5)
         }
     }
 }
@@ -519,7 +457,7 @@ struct QuestionCallout: View {
     let tint: Color
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("COPILOT ASKS")
+            Text("QUESTION FOR YOU")
                 .font(.system(size: 9.5, weight: .bold))
                 .tracking(0.6)
                 .foregroundStyle(tint)
