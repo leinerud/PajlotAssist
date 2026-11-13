@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import WidgetKit
 
 @MainActor
 final class SessionStore: ObservableObject {
@@ -75,10 +76,29 @@ final class SessionStore: ObservableObject {
                 let before = Dictionary(uniqueKeysWithValues: self.sessions.map { ($0.id, $0.status) })
                 if result.contains(where: { before[$0.id] == .working && ($0.status == .idle || $0.status == .stopped) }) { self.doneAt = Date() }
                 self.sessions = result
+                self.publishToWidget()
                 self.lastRefresh = Date()
                 self.loading = false
                 if self.refreshAgain { self.refreshAgain = false; self.refresh() }
             }
+        }
+    }
+
+    // MARK: - Widget
+
+    private var lastWidgetSessions: [WidgetSnapshot.Session]?
+
+    /// Hands the desktop widget a fresh summary, but only reloads it when something it shows changed.
+    private func publishToWidget() {
+        let items = sessions.filter { $0.status != .stopped }.prefix(8).map {
+            WidgetSnapshot.Session(id: $0.id, title: $0.title, repo: $0.repoShortName, status: $0.status.rawValue,
+                                   activity: $0.activity, question: $0.question,
+                                   done: $0.doneCount, total: $0.todos.count, updatedAt: $0.updatedAt)
+        }
+        guard items != lastWidgetSessions else { return }
+        lastWidgetSessions = items
+        if WidgetSnapshot(sessions: Array(items), savedAt: Date()).save() {
+            WidgetCenter.shared.reloadTimelines(ofKind: WidgetSnapshot.widgetKind)
         }
     }
 

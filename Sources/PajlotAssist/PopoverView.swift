@@ -64,6 +64,7 @@ struct PopoverView: View {
     @State private var filter: Filter = .active
     @State private var listHeight: CGFloat = 0
     @State private var spin = 0.0
+    @Environment(\.openSettings) private var openSettings
 
     enum Filter: String, CaseIterable, Identifiable {
         case active = "Now", recent = "All"
@@ -227,6 +228,10 @@ struct PopoverView: View {
                 withAnimation(.easeInOut(duration: 0.6)) { spin += 360 }
                 store.refresh()
             }
+            IconButton(symbol: "gearshape", help: "Settings: Dock, menu bar and desktop widget", shortcut: ",") {
+                NSApp.activate()
+                openSettings()
+            }
             IconButton(symbol: "power", help: "Close this helper (your sessions keep running)", shortcut: "q") {
                 NSApplication.shared.terminate(nil)
             }
@@ -283,12 +288,15 @@ struct SessionCard: View {
             .help(session.branch.map { "Project: \(session.repoShortName) · Branch: \($0)" } ?? "Project: \(session.repoShortName)")
 
             if let q = session.question { QuestionCallout(text: q, tint: tint) }
-            if session.status == .working { progress }
-            if expanded && !session.todos.isEmpty {
-                StepList(todos: session.todos, tint: tint)
-                    // Fade in once the card has made room, so the list never draws over the rows above it.
-                    .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.18).delay(0.12)),
-                                            removal: .opacity.animation(.easeOut(duration: 0.08))))
+            if session.status == .working { progress } else if hasDetails { detailsRow }
+            if expanded {
+                VStack(alignment: .leading, spacing: 8) {
+                    if !session.todos.isEmpty { StepList(todos: session.todos, tint: tint, live: session.isActive) }
+                    if !session.isActive, let m = session.lastMessage { ResultNote(text: m) }
+                }
+                // Fade in once the card has made room, so the list never draws over the rows above it.
+                .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.18).delay(0.12)),
+                                        removal: .opacity.animation(.easeOut(duration: 0.08))))
             }
 
             if needsYou {
@@ -330,6 +338,37 @@ struct SessionCard: View {
             .overlay(shape.strokeBorder(session.isActive ? tint.opacity(0.45) : Palette.hairline, lineWidth: 1))
     }
 
+    /// Finished work keeps its steps and final note, so you can look back at what it did.
+    private var hasDetails: Bool { !session.todos.isEmpty || session.lastMessage != nil }
+
+    private var detailsRow: some View {
+        HStack(spacing: 8) {
+            Text(session.todos.isEmpty ? "See what it did"
+                 : "\(session.doneCount) of \(session.todos.count) steps done")
+                .lineLimit(1)
+            Spacer(minLength: 4)
+            toggle(Text(session.todos.isEmpty ? "Details" : "Steps"))
+        }
+        .font(.system(size: 11))
+        .foregroundStyle(.secondary)
+    }
+
+    private func toggle(_ label: Text) -> some View {
+        Button { withAnimation(.snappy(duration: 0.3)) { expanded.toggle() } } label: {
+            HStack(spacing: 4) {
+                label
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 8.5, weight: .bold))
+                    .rotationEffect(.degrees(expanded ? 180 : 0))
+            }
+            .padding(.horizontal, 7).frame(height: 20)
+            .background(Capsule().fill(Palette.well.opacity(hovering ? 1 : 0.6)))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .help(expanded ? "Hide details" : "Show the steps and what it did")
+    }
+
     @ViewBuilder private var progress: some View {
         if let p = session.progress {
             VStack(alignment: .leading, spacing: 7) {
@@ -337,19 +376,7 @@ struct SessionCard: View {
                 HStack(spacing: 8) {
                     Text(session.currentTodo?.title ?? session.activity).lineLimit(1)
                     Spacer(minLength: 4)
-                    Button { withAnimation(.snappy(duration: 0.3)) { expanded.toggle() } } label: {
-                        HStack(spacing: 4) {
-                            Text("\(session.doneCount)/\(session.todos.count)").monospacedDigit()
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 8.5, weight: .bold))
-                                .rotationEffect(.degrees(expanded ? 180 : 0))
-                        }
-                        .padding(.horizontal, 7).frame(height: 20)
-                        .background(Capsule().fill(Palette.well.opacity(hovering ? 1 : 0.6)))
-                        .contentShape(Capsule())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Show the steps for this task")
+                    toggle(Text("\(session.doneCount)/\(session.todos.count)").monospacedDigit())
                 }
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary)
@@ -489,6 +516,29 @@ struct QuestionCallout: View {
     }
 }
 
+/// The last thing the session reported, shown when you open a finished task.
+struct ResultNote: View {
+    let text: String
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("LAST UPDATE")
+                .font(.system(size: 9.5, weight: .bold))
+                .tracking(0.6)
+                .foregroundStyle(.tertiary)
+            Text(text)
+                .font(.system(size: 11.5))
+                .foregroundStyle(.secondary)
+                .lineSpacing(1.5)
+                .lineLimit(12)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
+        }
+        .padding(11)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Palette.well.opacity(0.55)))
+    }
+}
+
 struct ProgressTrack: View {
     let value: Double
     let tint: Color
@@ -510,6 +560,8 @@ struct ProgressTrack: View {
 struct StepList: View {
     let todos: [TodoItem]
     let tint: Color
+    /// While work is running, finished steps are struck through; afterwards they stay readable.
+    var live = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -523,8 +575,8 @@ struct StepList: View {
                     }
                     Text(t.title)
                         .font(.system(size: 11.5, weight: t.state == .in_progress ? .medium : .regular))
-                        .foregroundStyle(t.state == .done ? .tertiary : .primary)
-                        .strikethrough(t.state == .done, color: .secondary)
+                        .foregroundStyle(t.state == .done && live ? .tertiary : .primary)
+                        .strikethrough(t.state == .done && live, color: .secondary)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.bottom, i < todos.count - 1 ? 8 : 0)
                     Spacer(minLength: 0)
