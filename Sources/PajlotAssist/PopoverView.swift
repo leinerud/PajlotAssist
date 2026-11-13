@@ -159,7 +159,10 @@ struct PopoverView: View {
             .padding(.horizontal, Metrics.gutter)
             .padding(.top, 2)
             .padding(.bottom, Metrics.gutter)
-            .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { listHeight = $0 }
+            .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { h in
+                // Grow/shrink together with the cards (e.g. when steps open), but size instantly on first show.
+                if listHeight == 0 { listHeight = h } else { withAnimation(.snappy(duration: 0.3)) { listHeight = h } }
+            }
         }
         .scrollIndicators(.automatic)
         .frame(height: min(max(listHeight, 120), Metrics.maxListHeight))
@@ -243,8 +246,13 @@ struct PopoverView: View {
 /// Click anywhere on the card to open the session.
 struct SessionCard: View {
     let session: CopilotSession
-    @State private var expanded = false
+    @State private var expanded: Bool
     @State private var hovering = false
+
+    init(session: CopilotSession, expanded: Bool = false) {
+        self.session = session
+        _expanded = State(initialValue: expanded)
+    }
 
     private var tint: Color { session.status.tint }
     private var needsYou: Bool { session.status == .needsInput }
@@ -278,7 +286,9 @@ struct SessionCard: View {
             if session.status == .working { progress }
             if expanded && !session.todos.isEmpty {
                 StepList(todos: session.todos, tint: tint)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    // Fade in once the card has made room, so the list never draws over the rows above it.
+                    .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.18).delay(0.12)),
+                                            removal: .opacity.animation(.easeOut(duration: 0.08))))
             }
 
             if needsYou {
@@ -327,7 +337,7 @@ struct SessionCard: View {
                 HStack(spacing: 8) {
                     Text(session.currentTodo?.title ?? session.activity).lineLimit(1)
                     Spacer(minLength: 4)
-                    Button { withAnimation(.snappy) { expanded.toggle() } } label: {
+                    Button { withAnimation(.snappy(duration: 0.3)) { expanded.toggle() } } label: {
                         HStack(spacing: 4) {
                             Text("\(session.doneCount)/\(session.todos.count)").monospacedDigit()
                             Image(systemName: "chevron.down")
